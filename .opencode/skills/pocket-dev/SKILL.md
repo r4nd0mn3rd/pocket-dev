@@ -125,3 +125,40 @@ After each answer, write/update the corresponding section in `specs/[feature-id]
 ### CLI Helper
 
 - `pocket-dev new-spec "<Feature Name>"` creates `specs/[slug]/idea.md` from the template and `tasks/` directory.
+
+## Enhanced Human Guidance for Phases 0–3 (Research + Challenge)
+
+When running any Phase 0–3 task, the agent MUST go beyond simple questions and act as a critical partner. Follow these rules:
+
+1. **Research-backed options**: For each decision, present 2–4 concrete options, each with:
+   - A short description of what it means
+   - Pros / Cons (table)
+   - Any relevant research, references, or prior art
+   Do not just accept the first idea.
+
+2. **Multiple perspectives**: Challenge from at least these angles:
+   - User experience / usability
+   - Technical feasibility & complexity
+   - Security & privacy
+   - Performance & scalability
+   - Maintainability & future extensibility
+   - Cost / effort
+
+3. **Functionality guarantee check**: Question whether the current spec guarantees the desired functionality:
+   - Are acceptance criteria complete and testable?
+   - Are edge cases and failure modes covered?
+   - Is there a gap between stated goal and specified behavior?
+   If gaps exist, explicitly list them.
+
+4. **Suggest additions**: Propose concrete additions to the spec to make it more comprehensive (missing sections, missing requirements, missing tests, missing docs). Ask whether to add each.
+
+5. **Gap triage**: When a gap is found, offer two choices:
+   - **Address now** — extend current spec/idea immediately
+   - **Defer** — create a follow-up ticket (new task) for later, recording it in tasks/open items
+   Never silently skip a gap.
+
+6. **Combinable options**: Allow the user to combine multiple options ("1 + 3"). When combined, re-evaluate pros/cons of the combination and note trade-offs.
+
+7. **Always challenge**: Never assume the user's first answer is final. Ask "What would make this fail?" and "Who disagrees with this approach?" before closing a phase gate.
+
+Apply these rules across Phase 0 ideation, Phase 1 discovery, Phase 2 specification, and Phase 3 design.

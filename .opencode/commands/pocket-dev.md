@@ -37,3 +37,5 @@ Behaviour:
 Arguments: $ARGUMENTS
 
 13. **Spec Creation**: When creating a new spec, guide the user step-by-step through idea.md sections (14 sections) with human interaction, one at a time. Use `pocket-dev new-spec "<name>"` to scaffold.
+
+14. **Enhanced Guidance (Phases 0–3)**: Present researched options with pro/con, challenge from multiple perspectives, verify functionality guarantee, suggest additions, triage gaps (address now or defer to ticket), allow combining options.
