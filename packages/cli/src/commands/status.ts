@@ -22,6 +22,14 @@ export async function runStatus(root: string): Promise<void> {
     if (updated) {
       console.log(chalk.cyan(`\nScanned specs directory: found ${featuresFound} feature(s) and ${tasksFound} task(s)`));
       console.log(chalk.cyan('Updated state.json with scanned features and tasks.\n'));
+      // Reload state to get the updated data
+      const freshState = loadState(root);
+      if (freshState) {
+        // Use the fresh state for the rest of the output
+        state.features = freshState.features;
+        state.tasks = freshState.tasks;
+        state.stats = freshState.stats;
+      }
     }
   }
   
