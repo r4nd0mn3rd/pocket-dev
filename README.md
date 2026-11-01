@@ -22,6 +22,9 @@ You're one person with big ideas, but:
 - **Quality gates** – Objective checkpoints that agents can validate automatically
 - **Live Kanban board** – Real-time visibility with interactive task management
 - **Auto-agent triggering** – Click a task action, the relevant agent starts working
+- **Terminal overlay** – See agent session details directly in the browser
+- **Multi-agent support** – Works with Vibe, Claude Code, and OpenCode
+- **Human-in-the-loop** – Critical phases require human interaction
 
 ---
 
@@ -123,6 +126,23 @@ Each task on the Kanban board has **action buttons** (Start, Complete, Block, Un
 | `pocket-dev validate` | Runs 170+ consistency checks against the framework |
 | `pocket-dev deps` | Verifies Node.js, npm, Git, and other required tools |
 | `pocket-dev board [--port 4173] [--open]` | Serves the interactive Kanban board |
+| `pocket-dev scan [-v]` | Scans specs directory and populates state.json with features and tasks |
+
+### Board Actions
+
+When viewing the board, each task card has action buttons:
+
+| Button | From Status | To Status | Trigger |
+|--------|-------------|-----------|---------|
+| **Start** | Pending | In Progress | Auto-agent triggered |
+| **Start Dev** | Ready for Dev | In Progress | Auto-agent triggered |
+| **Continue** | In Progress | In Progress | Auto-agent triggered |
+| **Complete** | In Progress | Completed | Auto-agent triggered |
+| **Block** | In Progress | Blocked | Auto-agent triggered |
+| **Unblock** | Blocked | In Progress | Auto-agent triggered |
+| **Reopen** | Completed/Cancelled | In Progress | Auto-agent triggered |
+
+Each action triggers the configured AI agent (Vibe, Claude, OpenCode) with full task context.
 
 ---
 
