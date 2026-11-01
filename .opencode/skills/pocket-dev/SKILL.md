@@ -98,3 +98,30 @@ Behaviour:
 12. Keep the UI simple: render a compact board and offer numbered actions.
 
 Examples use the Pocket Dev suite and theoretical features only.
+
+## Create New Spec — Step-by-Step Idea Completion (Phase 0)
+
+When a user wants to create a new spec/idea, guide them **section by section** through `specs/[feature-id]/idea.md`, collecting human input for each field before writing. Do NOT auto-fill. Follow the same human-interaction requirement as Stages 0–3.
+
+### Wizard Steps (ask one, wait, then next)
+
+1. **Idea Name** — "What is the brief name for this idea?"
+2. **Elevator Pitch** — "Describe the idea in 1–2 sentences (plain language, no tech)."
+3. **Problem Statement** — "What problem does it solve? Who has it? Impact?"
+4. **Proposed Solution** — "High-level what are we building? User experience?"
+5. **Goals & Success Criteria** — "Primary goal and 1–3 success metrics."
+6. **Scope** — "In scope items (bullets). Out of scope items."
+7. **Assumptions & Dependencies** — "List assumptions and dependencies with categories."
+8. **Alignment** — "How does this align with project goals and constitution?"
+9. **Feasibility** — "Technical/resource/legal feasibility notes + rough effort."
+10. **Risks** — "At least 3 risks with mitigation."
+11. **Alternatives** — "At least 1 alternative and why not chosen."
+12. **Open Questions** — "Must be EMPTY before Gate 0; resolve now."
+13. **Decisions** — "Record any decisions made."
+14. **Next Steps** — "What happens if approved (Phase 1 Discovery)."
+
+After each answer, write/update the corresponding section in `specs/[feature-id]/idea.md` and confirm with the user before proceeding. Never move to Phase 1 until all required sections are complete and open questions resolved. Use `pocket-dev new-spec "<name>"` to scaffold the directory first.
+
+### CLI Helper
+
+- `pocket-dev new-spec "<Feature Name>"` creates `specs/[slug]/idea.md` from the template and `tasks/` directory.

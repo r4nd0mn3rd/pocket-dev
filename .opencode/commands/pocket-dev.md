@@ -35,3 +35,5 @@ Behaviour:
 12. Ensure tests pass and documentation matches implementation before marking complete.
 
 Arguments: $ARGUMENTS
+
+13. **Spec Creation**: When creating a new spec, guide the user step-by-step through idea.md sections (14 sections) with human interaction, one at a time. Use `pocket-dev new-spec "<name>"` to scaffold.

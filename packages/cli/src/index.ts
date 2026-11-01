@@ -64,6 +64,15 @@ program
     await runScan(process.cwd(), opts);
   });
 
+
+program
+  .command("new-spec <name>")
+  .description("Create a new feature spec scaffold with idea.md template")
+  .action(async (name) => {
+    const { runNewSpec } = await import("./commands/newspec.js");
+    await runNewSpec(process.cwd(), name);
+  });
+
 program.parseAsync(process.argv).catch((err) => {
   console.error(chalk.red('Error:'), err?.message ?? err);
   process.exit(1);
