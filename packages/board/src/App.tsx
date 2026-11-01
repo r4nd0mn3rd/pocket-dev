@@ -34,8 +34,8 @@ export function App(): React.ReactElement {
         .catch(() => { setTasks(SAMPLE); setLoading(false); });
     };
     load();
-    // Poll every 5 seconds for agent updates
-    const interval = setInterval(load, 5000);
+    // Poll every 2 seconds for agent updates (reduced from 5s for better sync)
+    const interval = setInterval(load, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -82,12 +82,14 @@ export function App(): React.ReactElement {
   const [terminalContent, setTerminalContent] = useState<string[]>([]);
   const [currentSession, setCurrentSession] = useState<string | null>(null);
   const [integration, setIntegration] = useState<string>('none');
+  const [projectName, setProjectName] = useState<string>('');
+  const [version, setVersion] = useState<string>('');
 
   // Load integration setting
   useEffect(() => {
     fetch('/api/state')
       .then(r => r.json())
-      .then((state: any) => setIntegration(state.integration || 'none'))
+      .then((state: any) => { setIntegration(state.integration || 'none'); setProjectName(state.project_name || ''); setVersion(state.version || ''); })
       .catch(() => setIntegration('none'));
   }, []);
 
@@ -103,7 +105,10 @@ export function App(): React.ReactElement {
         const { task: updated } = await res.json();
         setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updated } : t));
         if (selected?.id === id) setSelected(prev => prev ? { ...prev, ...updated } : null);
-        setNotification({ message: `Agent triggered for: ${action}`, type: 'success' });
+        const actionDesc = action === 'review' 
+          ? 'Code review - implementation will be checked against specification'
+          : `Agent triggered for: ${action}`;
+        setNotification({ message: actionDesc, type: 'success' });
         // Show terminal overlay with agent info and observation instructions
         const observationInstructions = integration === 'opencode' 
           ? `> To observe: Check your OpenCode application - a new session should have opened with the prompt.`
@@ -113,17 +118,26 @@ export function App(): React.ReactElement {
           ? `> To observe: Check your terminal where Claude Code is running, or open Claude separately.`
           : `> To observe: Agent prompt saved to file. Open your agent manually.`;
         
-        setTerminalContent([
+        const terminalLines = [
           `> Agent Session Started (${new Date().toLocaleTimeString()})`,
           `> Action: ${action}`,
           `> Task: ${updated.name || id}`,
           `> Phase: ${updated.phase || 'unknown'}`,
           `> Status: ${updated.status || 'unknown'}`,
           `> Integration: ${integration || 'none'}`,
-          `>`,
-          observationInstructions,
-          `> Prompt saved to: .pocket-dev/prompt-${id}-*.md`
-        ]);
+          `>`
+        ];
+        
+        if (action === 'review') {
+          terminalLines.push(`> CODE REVIEW - Implementation will be checked against specification`);
+          terminalLines.push(`> Reviewing documentation consistency with code`);
+          terminalLines.push(`> Review comments will be written to the task`);
+        }
+        
+        terminalLines.push(observationInstructions);
+        terminalLines.push(`> Prompt saved to: .pocket-dev/prompt-${id}-*.md`);
+        
+        setTerminalContent(terminalLines);
         setCurrentSession(`agent-${id}-${Date.now()}`);
         setTerminalVisible(true);
       } else {
@@ -142,7 +156,7 @@ export function App(): React.ReactElement {
   return (
     <div className="app">
       <header>
-        <h1>Pocket Dev Agile Board</h1>
+        <h1>Pocket Dev Agile Board{projectName ? ` - ${projectName}` : ''}</h1>
         <p>{tasks.length} tasks · Click a tile for details and actions</p>
       </header>
       {notification && (
@@ -177,8 +191,9 @@ export function App(): React.ReactElement {
         ))}
       </div>
       {selected && (
-        <TaskDrawer task={selected} onClose={() => setSelected(null)} onAction={handleAction} />
+        <TaskDrawer task={selected} onClose={() => setSelected(null)} onAction={handleAction} onTaskUpdate={(updated:any) => { setTasks(prev => prev.map(t => t.id === updated.id ? { ...t, ...updated } : t)); setSelected(prev => prev ? { ...prev, ...updated } : null); }} />
       )}
+      <footer style={{ position: "fixed", bottom: 8, right: 12, fontSize: 11, color: "#64748b" }}>v{version}</footer>
     </div>
   );
 }

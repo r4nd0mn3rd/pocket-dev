@@ -55,7 +55,7 @@ export function printUsage(integration: Integration): void {
   console.log('  pocket-dev status             Show project status summary');
   console.log('  pocket-dev validate           Validate framework structure');
   console.log('  pocket-dev deps               Check dependencies');
-  console.log('  pocket-dev board              Launch agile board (http://localhost:4173)');
+  console.log('  pocket-dev board              Launch agile board (http://localhost:<port>)');
   console.log('\nProject workflow:');
   console.log('  1. Write an idea in Docs/00-idea/idea.md');
   console.log('  2. Run your AI agent (claude / opencode / vibe) and invoke /pocket-dev');
@@ -84,7 +84,7 @@ const CLAUDE_CMD = `# Pocket Dev Framework
 
 Load and follow the Solo Agent Development Framework. Read AGENTS.md and .pocket-dev/00-constitution/constitution.md, then help the user drive a feature through phases 0-5.
 
-The board is served at http://localhost:4173.
+The board is served at http://localhost:<port>.
 
 Use pocket-dev status / pocket-dev validate as needed.
 `;
@@ -122,7 +122,7 @@ Start the agile board:
 pocket-dev board --port 4173 --open
 \`\`\`
 
-The board opens at http://localhost:4173.
+The board opens at http://localhost:<port>.
 
 Load and follow the Solo Agent Development Framework (Pocket Dev). Read constitution, methodology, templates, and standards. Use pocket-dev CLI for status and validation.
 

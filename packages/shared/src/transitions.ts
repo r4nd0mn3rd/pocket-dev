@@ -1,12 +1,12 @@
 import { Task, TaskStatus } from './models.js';
 
-export type TransitionAction = 'start' | 'start-dev' | 'continue' | 'complete' | 'block' | 'unblock' | 'reopen' | 'cancel';
+export type TransitionAction = 'start' | 'start-dev' | 'continue' | 'complete' | 'block' | 'unblock' | 'reopen' | 'cancel' | 'review';
 
 export function availableActions(status: TaskStatus): TransitionAction[] {
   switch (status) {
     case 'pending': return ['start'];
     case 'ready-for-dev': return ['start-dev'];
-    case 'in-progress': return ['continue', 'complete', 'block'];
+    case 'in-progress': return ['continue', 'complete', 'block', 'review'];
     case 'blocked': return ['unblock', 'cancel'];
     case 'completed': return ['reopen'];
     case 'cancelled': return ['reopen'];
@@ -29,6 +29,9 @@ export function transition(task: Task, action: TransitionAction): Task {
       break;
     case 'complete':
       next.status = 'completed';
+      break;
+    case 'review':
+      next.status = 'in-progress';
       break;
     case 'block':
       next.status = 'blocked';

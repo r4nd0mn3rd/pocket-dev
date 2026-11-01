@@ -42,3 +42,15 @@ header p { color: #94a3b8; font-size: 13px; margin-top: 4px; }
 .terminal-body { padding: 16px; overflow-y: auto; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
 .terminal-line { color: #e2e8f0; }
 .terminal-line:first-child { color: #3b82f6; }
+
+/* Modal overlay for long text */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.modal-body { background: #1e293b; border: 1px solid #334155; border-radius: 10px; max-width: 800px; width: 100%; max-height: 80vh; overflow: auto; padding: 20px; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+.modal-body pre { white-space: pre-wrap; word-break: break-word; }
+
+/* Nicer buttons */
+.drawer .actions button, .tile button { border-radius: 6px; padding: 6px 12px; font-weight: 600; transition: opacity 0.15s, transform 0.1s; cursor: pointer; }
+.drawer .actions button:hover { opacity: 0.9; transform: translateY(-1px); }
+.drawer .actions button.secondary { background: #334155; color: #e2e8f0; border: 1px solid #475569; }
+.drawer .actions button.danger { background: #ef4444; }
+.drawer .close, .modal-body .close { background: #334155; color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; }

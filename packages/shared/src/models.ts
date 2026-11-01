@@ -20,6 +20,11 @@ export interface Task {
   openItems?: string[];
   nextSteps?: string[];
   blockedReason?: string;
+  specification?: string;
+  userStories?: string[];
+  requirements?: string[];
+  successCriteria?: string[];
+  acceptanceCriteria?: string[];
 }
 
 export interface Feature {

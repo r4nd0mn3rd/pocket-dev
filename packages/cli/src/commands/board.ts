@@ -21,6 +21,12 @@ function buildAgentPrompt(task: Task, action: TransitionAction, state: ProjectSt
   const agentRole = state.framework_config.agent_roles[String(phase)];
   const integration = state.integration ?? 'none';
   
+  // Determine role based on action
+  let role = state.framework_config.agent_roles[String(phase)];
+  if (action === 'review') {
+    role = 'code-reviewer';
+  }
+  
   // Build context from task
   const contextParts = [
     `Project: ${state.project_name}`,
@@ -44,7 +50,7 @@ function buildAgentPrompt(task: Task, action: TransitionAction, state: ProjectSt
   const checklistsDir = join(root, '.pocket-dev', '05-checklists');
   
   // Build instructions based on action
-  const instructions = buildActionInstructions(action, task, phase, agentRole, integration, templatesDir, checklistsDir);
+  const instructions = buildActionInstructions(action, task, phase, role, integration, templatesDir, checklistsDir);
   
   return contextParts.join('\n') + '\n\n' + instructions;
 }
@@ -72,6 +78,9 @@ function buildActionInstructions(action: TransitionAction, task: Task, phase: nu
       break;
     case 'complete':
       baseInstructions.push(`Complete this task. Ensure all acceptance criteria are met and documentation is updated.`);
+      break;
+    case 'review':
+      baseInstructions.push(`**REVIEW REQUIREMENT**: You are the **code-reviewer** agent. Review the implementation against the specification. Verify documentation is in-line with code. Write code review comments. Challenge approach and recommend improvements.`);
       break;
     case 'block':
       baseInstructions.push(`Identify what is blocking this task and document the blocking reason.`);
@@ -248,11 +257,31 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
       const state = loadState(root);
       if (state) {
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ integration: state.integration || 'none' }));
+        res.end(JSON.stringify({ integration: state.integration || 'none', project_name: state.project_name || '', board_port: port, version: (state && state.framework_version) || '1.0.0' }));
       } else {
         res.statusCode = 404;
         res.end(JSON.stringify({ error: 'No state found' }));
       }
+      return;
+    }
+    if (url === '/api/task/update' && req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const { id, changes } = JSON.parse(body);
+          const state = loadState(root);
+          if (!state) { res.statusCode = 400; return res.end(JSON.stringify({ error: 'No state' })); }
+          const idx = state.tasks.findIndex(t => t.id === id);
+          if (idx === -1) { res.statusCode = 404; return res.end(JSON.stringify({ error: 'Task not found' })); }
+          state.tasks[idx] = { ...state.tasks[idx], ...changes, updatedAt: new Date().toISOString() };
+          saveState(root, state);
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ ok: true, task: state.tasks[idx] }));
+        } catch (e: any) {
+          res.statusCode = 500; res.end(JSON.stringify({ error: e && e.message ? e.message : String(e) }));
+        }
+      });
       return;
     }
     if (url === '/tasks.json') {
@@ -268,6 +297,11 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
         openItems: t.openItems,
         nextSteps: t.nextSteps,
         blockedReason: t.blockedReason,
+        specification: t.specification,
+        userStories: t.userStories,
+        requirements: t.requirements,
+        successCriteria: t.successCriteria,
+        acceptanceCriteria: t.acceptanceCriteria,
         estimatedHours: t.estimatedHours,
         actualHours: t.actualHours
       }));
@@ -299,7 +333,8 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
     res.setHeader('Content-Type', MIME[ext] ?? 'application/octet-stream');
     res.end(readFileSync(file));
   });
-  server.listen(port, () => {
+  console.log('\n' + chalk.green(`Pocket Dev Agile Board running at http://localhost:${port}`) + '\n');
+server.listen(port, () => {
     console.log(chalk.green(`Pocket Dev board running at http://localhost:${port}`));
     console.log(chalk.gray('Press Ctrl+C to stop.\n'));
   });

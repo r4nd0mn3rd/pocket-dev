@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import chalk from 'chalk';
-const version = '1.0.0';
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'package.json'), 'utf8'));
+const version = pkg.version ?? '1.0.0';
 
 const program = new Command();
 
@@ -62,6 +67,35 @@ program
   .action(async (opts) => {
     const { runScan } = await import('./commands/scan.js');
     await runScan(process.cwd(), opts);
+  });
+
+
+program
+  .command("new-spec <name>")
+  .description("Create a new feature spec scaffold with idea.md template")
+  .action(async (name) => {
+    const { runNewSpec } = await import("./commands/newspec.js");
+    await runNewSpec(process.cwd(), name);
+  });
+
+
+program
+  .command("version")
+  .description("Show or bump version")
+  .option("--bump <level>", "Bump version: patch, minor, or major")
+  .action(async (opts) => {
+    const { runVersion } = await import("./commands/version.js");
+    await runVersion(process.cwd(), opts);
+  });
+
+
+program
+  .command("update")
+  .description("Pull and install latest version from main (stable) or dev (preview)")
+  .option("-b, --branch <name>", "Branch to install: main or dev")
+  .action(async (opts) => {
+    const { runUpdate } = await import("./commands/update.js");
+    await runUpdate(process.cwd(), opts);
   });
 
 program.parseAsync(process.argv).catch((err) => {

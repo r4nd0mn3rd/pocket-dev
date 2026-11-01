@@ -29,5 +29,13 @@ Behaviour:
 6. For Phase 3-5 only: May assume correct agent role by phase.
 7. Always guide the user on the current step, and save state after changes.
 8. Keep the UI simple: render a compact board and offer numbered actions.
+9. **ALWAYS create tests** and verify success before closing a ticket.
+10. **ALWAYS update documentation** along with implementation changes.
+11. **Run code-reviewer** before closing ticket - only close when code-reviewer has no objections.
+12. Ensure tests pass and documentation matches implementation before marking complete.
 
 Arguments: $ARGUMENTS
+
+13. **Spec Creation**: When creating a new spec, guide the user step-by-step through idea.md sections (14 sections) with human interaction, one at a time. Use `pocket-dev new-spec "<name>"` to scaffold.
+
+14. **Enhanced Guidance (Phases 0–3)**: Present researched options with pro/con, challenge from multiple perspectives, verify functionality guarantee, suggest additions, triage gaps (address now or defer to ticket), allow combining options.

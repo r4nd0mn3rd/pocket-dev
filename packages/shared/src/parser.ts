@@ -35,7 +35,12 @@ function normalizeTask(t: any): Task {
     dependencies: t.dependencies ?? [],
     openItems: t.openItems ?? t.open_items ?? [],
     nextSteps: t.nextSteps ?? t.next_steps ?? [],
-    blockedReason: t.blockedReason ?? t.blocked_reason
+    blockedReason: t.blockedReason ?? t.blocked_reason,
+    specification: t.specification,
+    userStories: t.userStories,
+    requirements: t.requirements,
+    successCriteria: t.successCriteria,
+    acceptanceCriteria: t.acceptanceCriteria
   };
 }
 
