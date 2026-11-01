@@ -257,7 +257,7 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
       const state = loadState(root);
       if (state) {
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ integration: state.integration || 'none', project_name: state.project_name || '', board_port: port }));
+        res.end(JSON.stringify({ integration: state.integration || 'none', project_name: state.project_name || '', board_port: port, version: (state && state.framework_version) || '1.0.0' }));
       } else {
         res.statusCode = 404;
         res.end(JSON.stringify({ error: 'No state found' }));

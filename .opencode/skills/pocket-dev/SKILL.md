@@ -67,7 +67,7 @@ triggers:
 
 ```bash
 # Use CLI for advanced operations
-pocket-dev board --port 4173 --open
+pocket-dev board --port <port> --open  (default 4173)
 ```
 
 ## Full Framework Usage

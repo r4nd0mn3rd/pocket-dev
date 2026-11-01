@@ -73,6 +73,16 @@ program
     await runNewSpec(process.cwd(), name);
   });
 
+
+program
+  .command("version")
+  .description("Show or bump version")
+  .option("--bump <level>", "Bump version: patch, minor, or major")
+  .action(async (opts) => {
+    const { runVersion } = await import("./commands/version.js");
+    await runVersion(process.cwd(), opts);
+  });
+
 program.parseAsync(process.argv).catch((err) => {
   console.error(chalk.red('Error:'), err?.message ?? err);
   process.exit(1);
