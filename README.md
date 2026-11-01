@@ -204,4 +204,4 @@ Pocket Dev is successful when:
 
 ---
 
-**Framework**: v1.0.0 &nbsp;&nbsp; **Package**: `pocket-dev` &nbsp;&nbsp; **License**: MIT &nbsp;&nbsp; **Repository**: [github.com/r4nd0mn3rd/agent_framework](https://github.com/r4nd0mn3rd/agent_framework)
+**Framework**: v1.0.0 &nbsp;&nbsp; **Package**: `pocket-dev` &nbsp;&nbsp; **License**: MIT &nbsp;&nbsp; **Repository**: [github.com/r4nd0mn3rd/pocket-dev](https://github.com/r4nd0mn3rd/pocket-dev)
