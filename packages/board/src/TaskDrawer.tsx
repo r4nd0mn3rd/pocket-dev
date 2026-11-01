@@ -26,6 +26,7 @@ export function TaskDrawer({ task, onClose, onAction, onTaskUpdate }: Props): Re
   const [success, setSuccess] = useState((task.successCriteria ?? []).join('\n'));
   const [acceptance, setAcceptance] = useState((task.acceptanceCriteria ?? []).join('\n'));
   const [saving, setSaving] = useState(false);
+  const [overlayText, setOverlayText] = useState<string | null>(null);
 
   const save = async () => {
     setSaving(true);
@@ -51,6 +52,7 @@ export function TaskDrawer({ task, onClose, onAction, onTaskUpdate }: Props): Re
   };
 
   return (
+    <>
     <div className="drawer">
       <button className="close" onClick={onClose}>✕</button>
       <h2>{task.name}</h2>
@@ -106,5 +108,14 @@ export function TaskDrawer({ task, onClose, onAction, onTaskUpdate }: Props): Re
         </div>
       </div>
     </div>
+    {overlayText && (
+      <div className="modal-overlay" onClick={() => setOverlayText(null)}>
+        <div className="modal-body" onClick={e => e.stopPropagation()}>
+          <button className="close" onClick={() => setOverlayText(null)}>✕</button>
+          <pre style={{ whiteSpace: "pre-wrap", fontSize: 13 }}>{overlayText}</pre>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
