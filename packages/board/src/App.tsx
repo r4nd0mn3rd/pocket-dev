@@ -49,6 +49,27 @@ export function App(): React.ReactElement {
     }
   }, [tasks]);
 
+  // Support ?showTerminal=true for capturing terminal overlay
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('showTerminal')) {
+      setTerminalContent([
+        `> Agent Session Started (${new Date().toLocaleTimeString()})`,
+        `> Action: continue`,
+        `> Task: Implement scanner + SQLite store.`,
+        `> Phase: 3 (Design)`,
+        `> Status: in-progress`,
+        `> Integration: opencode`,
+        `>`,
+        `> To observe: Check your OpenCode application - a new session should have opened with the prompt.`,
+        `> Prompt saved to: .pocket-dev/prompt-task-1793527928501-pco5l9-*.md`
+      ]);
+      setCurrentSession('agent-screenshot');
+      setTerminalVisible(true);
+      setNotification({ message: 'Agent triggered for: continue', type: 'success' });
+    }
+  }, []);
+
   // Auto-hide notification after 5 seconds
   useEffect(() => {
     if (notification) {
