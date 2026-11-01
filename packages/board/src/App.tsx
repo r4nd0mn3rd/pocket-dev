@@ -83,12 +83,13 @@ export function App(): React.ReactElement {
   const [currentSession, setCurrentSession] = useState<string | null>(null);
   const [integration, setIntegration] = useState<string>('none');
   const [projectName, setProjectName] = useState<string>('');
+  const [version, setVersion] = useState<string>('');
 
   // Load integration setting
   useEffect(() => {
     fetch('/api/state')
       .then(r => r.json())
-      .then((state: any) => { setIntegration(state.integration || 'none'); setProjectName(state.project_name || ''); })
+      .then((state: any) => { setIntegration(state.integration || 'none'); setProjectName(state.project_name || ''); setVersion(state.version || ''); })
       .catch(() => setIntegration('none'));
   }, []);
 
@@ -192,6 +193,7 @@ export function App(): React.ReactElement {
       {selected && (
         <TaskDrawer task={selected} onClose={() => setSelected(null)} onAction={handleAction} onTaskUpdate={(updated:any) => { setTasks(prev => prev.map(t => t.id === updated.id ? { ...t, ...updated } : t)); setSelected(prev => prev ? { ...prev, ...updated } : null); }} />
       )}
+      <footer style={{ position: "fixed", bottom: 8, right: 12, fontSize: 11, color: "#64748b" }}>v{version}</footer>
     </div>
   );
 }
