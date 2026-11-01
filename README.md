@@ -20,11 +20,12 @@ You're one person with big ideas, but:
 - **Agent-ready specifications** – Every task is unambiguous and testable
 - **6-phase methodology** – Discovery → Specification → Design → Implementation → Verification
 - **Quality gates** – Objective checkpoints that agents can validate automatically
-- **Live Kanban board** – Real-time visibility with interactive task management
+- **Live Kanban board** – Real-time visibility with interactive task management (6 columns)
 - **Auto-agent triggering** – Click a task action, the relevant agent starts working
 - **Terminal overlay** – See agent session details directly in the browser
 - **Multi-agent support** – Works with Vibe, Claude Code, and OpenCode
 - **Human-in-the-loop** – Critical phases require human interaction
+- **State consistency** – Tasks stay in-progress until implementation is verified
 
 ---
 
@@ -91,13 +92,15 @@ Start with a clear problem statement. Pocket Dev provides templates for every ar
 
 ### 2. Click to Progress
 Each task on the Kanban board has **action buttons** (Start, Complete, Block, Unblock). When you click:
-1. ✅ **Status updates** – Task moves to the next column
-2. 🤖 **Agent launches** – The configured AI agent (Vibe, Claude, OpenCode) receives:
+1. ✅ **Status updates** – Task moves to the appropriate column
+2. 🖥️ **Terminal overlay** – Shows agent session details and observation instructions
+3. 🤖 **Agent launches** – The configured AI agent (Vibe, Claude, OpenCode) receives:
    - Full task context (name, description, phase, open items, next steps)
    - Phase-specific methodology guidelines
    - Relevant templates and standards
    - Instructions to update state when done
-3. 📊 **State persists** – Everything is saved to `.pocket-dev/state.json`
+   - Observation instructions for monitoring progress
+4. 📊 **State persists** – Everything is saved to `.pocket-dev/state.json`
 
 ### 3. Validate & Repeat
 - Run `pocket-dev validate` to ensure everything meets quality gates
@@ -110,10 +113,12 @@ Each task on the Kanban board has **action buttons** (Start, Complete, Block, Un
 
 ![Kanban board](docs/assets/kanban-board.png)
 
-*Click a tile → View details, open items, and next steps → Click "Start" → Agent begins work with full context from the framework*
+*Board with 6 columns: Pending, Ready for Dev, In Progress, Blocked, Completed, Cancelled · Click a tile → View details, open items, and next steps → Click action button → Agent begins work with full context from the framework*
 
 ![Kanban workflow demo](docs/assets/board-workflow-demo.gif)
-*Click a task tile → Drawer opens with details → Click action buttons to trigger agents automatically*
+*Click a task tile → Drawer opens with details → Click action button → Terminal overlay shows session → Agent triggered automatically*
+
+> **Note**: Screenshots will be updated to reflect the latest 6-column board design and terminal overlay features.
 
 ---
 

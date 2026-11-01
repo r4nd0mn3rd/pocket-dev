@@ -223,7 +223,7 @@ All automation components align with **Framework Constitution Principles**:
 
 ```bash
 # Navigate to framework root
-cd /path/to/agent_framework
+cd /path/to/pocket-dev
 
 # Run full check
 ./06-automation/scripts/framework-check.sh
