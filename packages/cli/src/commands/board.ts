@@ -257,11 +257,31 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
       const state = loadState(root);
       if (state) {
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ integration: state.integration || 'none' }));
+        res.end(JSON.stringify({ integration: state.integration || 'none', project_name: state.project_name || '', board_port: port }));
       } else {
         res.statusCode = 404;
         res.end(JSON.stringify({ error: 'No state found' }));
       }
+      return;
+    }
+    if (url === '/api/task/update' && req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const { id, changes } = JSON.parse(body);
+          const state = loadState(root);
+          if (!state) { res.statusCode = 400; return res.end(JSON.stringify({ error: 'No state' })); }
+          const idx = state.tasks.findIndex(t => t.id === id);
+          if (idx === -1) { res.statusCode = 404; return res.end(JSON.stringify({ error: 'Task not found' })); }
+          state.tasks[idx] = { ...state.tasks[idx], ...changes, updatedAt: new Date().toISOString() };
+          saveState(root, state);
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ ok: true, task: state.tasks[idx] }));
+        } catch (e: any) {
+          res.statusCode = 500; res.end(JSON.stringify({ error: e && e.message ? e.message : String(e) }));
+        }
+      });
       return;
     }
     if (url === '/tasks.json') {
@@ -277,6 +297,9 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
         openItems: t.openItems,
         nextSteps: t.nextSteps,
         blockedReason: t.blockedReason,
+        specification: t.specification,
+        successCriteria: t.successCriteria,
+        acceptanceCriteria: t.acceptanceCriteria,
         estimatedHours: t.estimatedHours,
         actualHours: t.actualHours
       }));
@@ -308,7 +331,8 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
     res.setHeader('Content-Type', MIME[ext] ?? 'application/octet-stream');
     res.end(readFileSync(file));
   });
-  server.listen(port, () => {
+  console.log('\n' + chalk.green(`Pocket Dev Agile Board running at http://localhost:${port}`) + '\n');
+server.listen(port, () => {
     console.log(chalk.green(`Pocket Dev board running at http://localhost:${port}`));
     console.log(chalk.gray('Press Ctrl+C to stop.\n'));
   });

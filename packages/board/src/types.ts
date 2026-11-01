@@ -14,4 +14,7 @@ export interface Task {
   blockedReason?: string;
   estimatedHours?: number;
   actualHours?: number;
+  specification?: string;
+  successCriteria?: string[];
+  acceptanceCriteria?: string[];
 }

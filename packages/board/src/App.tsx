@@ -82,12 +82,13 @@ export function App(): React.ReactElement {
   const [terminalContent, setTerminalContent] = useState<string[]>([]);
   const [currentSession, setCurrentSession] = useState<string | null>(null);
   const [integration, setIntegration] = useState<string>('none');
+  const [projectName, setProjectName] = useState<string>('');
 
   // Load integration setting
   useEffect(() => {
     fetch('/api/state')
       .then(r => r.json())
-      .then((state: any) => setIntegration(state.integration || 'none'))
+      .then((state: any) => { setIntegration(state.integration || 'none'); setProjectName(state.project_name || ''); })
       .catch(() => setIntegration('none'));
   }, []);
 
@@ -154,7 +155,7 @@ export function App(): React.ReactElement {
   return (
     <div className="app">
       <header>
-        <h1>Pocket Dev Agile Board</h1>
+        <h1>Pocket Dev Agile Board{projectName ? ` - ${projectName}` : ''}</h1>
         <p>{tasks.length} tasks · Click a tile for details and actions</p>
       </header>
       {notification && (
@@ -189,7 +190,7 @@ export function App(): React.ReactElement {
         ))}
       </div>
       {selected && (
-        <TaskDrawer task={selected} onClose={() => setSelected(null)} onAction={handleAction} />
+        <TaskDrawer task={selected} onClose={() => setSelected(null)} onAction={handleAction} onTaskUpdate={(updated:any) => { setTasks(prev => prev.map(t => t.id === updated.id ? { ...t, ...updated } : t)); setSelected(prev => prev ? { ...prev, ...updated } : null); }} />
       )}
     </div>
   );
