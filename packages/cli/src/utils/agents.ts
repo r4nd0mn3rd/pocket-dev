@@ -8,9 +8,15 @@ import { join } from 'node:path';
  * @returns true if human interaction is required, false otherwise
  */
 export function requiresHumanInteraction(root: string, phase: number): boolean {
+  // CRITICAL RULE: Phases 0-2 (Ideation, Discovery, Specification) ALWAYS require human interaction
+  // This is a non-negotiable rule per the framework constitution
+  if ([0, 1, 2].includes(phase)) {
+    return true;
+  }
+  
   const agentsMdPath = join(root, 'AGENTS.md');
   
-  // If AGENTS.md doesn't exist, use default behavior (no human interaction required)
+  // If AGENTS.md doesn't exist, no additional human interaction required for phases 3-5
   if (!existsSync(agentsMdPath)) {
     return false;
   }
@@ -18,7 +24,7 @@ export function requiresHumanInteraction(root: string, phase: number): boolean {
   try {
     const content = readFileSync(agentsMdPath, 'utf8');
     
-    // Check for explicit human interaction requirements
+    // Check for explicit human interaction requirements for any phase
     const phaseRequirements = [
       /NEVER run ideation or specification without user/i,
       /Ideation and specification are always interactive with human/i,
@@ -38,8 +44,7 @@ export function requiresHumanInteraction(root: string, phase: number): boolean {
     // Check if any requirement is present
     const requiresInteraction = phaseRequirements.some(regex => regex.test(content));
     
-    // For phases 0, 1, 2, if AGENTS.md exists and has interaction requirements, require human
-    if (requiresInteraction && [0, 1, 2].includes(phase)) {
+    if (requiresInteraction) {
       return true;
     }
     
@@ -63,7 +68,7 @@ export function requiresHumanInteraction(root: string, phase: number): boolean {
         /NEVER.*without user/i,
         /MUST.*human/i
       ];
-      if (criticalRules.some(regex => regex.test(content)) && [0, 1, 2].includes(phase)) {
+      if (criticalRules.some(regex => regex.test(content))) {
         return true;
       }
     }

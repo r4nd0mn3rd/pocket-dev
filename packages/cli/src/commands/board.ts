@@ -64,6 +64,9 @@ function buildActionInstructions(action: TransitionAction, task: Task, phase: nu
     case 'start':
       baseInstructions.push(`Begin work on this task. Follow the Pocket Dev methodology for ${phaseName}.`);
       break;
+    case 'start-dev':
+      baseInstructions.push(`Begin implementation work on this task. This is a development task in Phase ${phase} (${phaseName}).`);
+      break;
     case 'continue':
       baseInstructions.push(`Continue working on this task where you left off.`);
       break;
@@ -152,48 +155,65 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
           
           // Check if human interaction is required for this phase
           const needsHumanInteraction = requiresHumanInteraction(root, task.phase);
+          const integration = state.integration ?? 'none';
+          
+          // Always build the prompt
+          const agentRole = state.framework_config.agent_roles[String(task.phase)];
+          const prompt = buildAgentPrompt(task, action, state, root);
+          const promptFile = join(root, '.pocket-dev', `prompt-${task.id}-${Date.now()}.md`);
+          writeFileSync(promptFile, prompt, 'utf8');
           
           if (needsHumanInteraction) {
-            console.log(chalk.yellow(`[Agent] Phase ${task.phase} requires human interaction. Agent not auto-started.`));
-            console.log(chalk.yellow(`[Agent] Please run agent manually after human confirmation.`));
+            console.log(chalk.yellow(`[Agent] Phase ${task.phase} (${updatedTask.status}) requires human interaction. Agent not auto-started.`));
+            console.log(chalk.yellow(`[Agent] Please review the prompt and run agent manually.`));
+            console.log(chalk.cyan(`[Agent] Prompt saved: ${promptFile}`));
             
-            // Save prompt file for manual review
-            const agentRole = state.framework_config.agent_roles[String(task.phase)];
-            const prompt = buildAgentPrompt(task, action, state, root);
-            const promptFile = join(root, '.pocket-dev', `prompt-${task.id}-${Date.now()}.md`);
-            writeFileSync(promptFile, prompt, 'utf8');
-            console.log(chalk.cyan(`[Agent] Prompt saved for review: ${promptFile}`));
+            // For OpenCode specifically, provide guidance
+            if (integration === 'opencode') {
+              console.log(chalk.cyan(`[Agent] In OpenCode, run: /pocket-dev`));
+            }
           } else {
-            // Trigger agent for next step
-            const integration = state.integration ?? 'none';
+            // Trigger agent for next step if integration is configured
             if (integration && integration !== 'none') {
-              const agentRole = state.framework_config.agent_roles[String(task.phase)];
-              const prompt = buildAgentPrompt(task, action, state, root);
-              
-              // Save prompt file
-              const promptFile = join(root, '.pocket-dev', `prompt-${task.id}-${Date.now()}.md`);
-              writeFileSync(promptFile, prompt, 'utf8');
               console.log(chalk.cyan(`[Agent] Prompt saved: ${promptFile}`));
               
-              // Build and execute agent command
+              // Build and execute agent command based on integration
               let agentBin = '';
               let agentArgs: string[] = [];
+              let launchMessage = '';
+              
               switch (integration) {
                 case 'vibe':
                   agentBin = 'vibe';
                   agentArgs = ['-p', prompt];
+                  launchMessage = `Starting Vibe with injected prompt`;
                   break;
                 case 'claude':
                   agentBin = 'claude';
                   // Truncate and escape for CLI safety
                   const safePrompt = prompt.replace(/\n/g, ' ').slice(0, 7000);
                   agentArgs = ['--prompt', safePrompt];
+                  launchMessage = `Starting Claude with injected prompt`;
                   break;
                 case 'opencode':
                   agentBin = 'opencode';
-                  agentArgs = []; // Launch TUI - user will run /pocket-dev manually
+                  // Use OpenCode's --prompt flag to inject the prompt directly
+                  // Also limit length to avoid CLI issues
+                  const opencodePrompt = prompt.slice(0, 15000);
+                  agentArgs = ['--prompt', opencodePrompt, root];
+                  launchMessage = `Starting OpenCode with injected prompt in ${root}`;
+                  // Also save prompt file for reference
+                  const promptDir = join(root, '.pocket-dev', 'opencode-prompts');
+                  if (!existsSync(promptDir)) {
+                    mkdirSync(promptDir, { recursive: true });
+                  }
+                  const opencodePromptFile = join(promptDir, `prompt-${task.id}.md`);
+                  writeFileSync(opencodePromptFile, prompt, 'utf8');
+                  console.log(chalk.cyan(`[Agent] Prompt also saved at: ${opencodePromptFile}`));
                   break;
               }
+              
+              console.log(chalk.green(`[Agent] ${launchMessage}`));
               
               try {
                 const proc = spawn(agentBin, agentArgs, { 
@@ -203,10 +223,14 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
                   detached: true
                 });
                 proc.unref();
-                console.log(chalk.green(`[Agent] Started: ${agentBin} ${agentArgs.join(' ')}`));
+                console.log(chalk.green(`[Agent] Process started: ${agentBin} ${agentArgs.join(' ')}`));
               } catch (e: any) {
-                console.log(chalk.yellow(`[Agent] Could not start ${agentBin}: ${e.message}. Please ensure it is installed and in PATH.`));
+                console.log(chalk.yellow(`[Agent] Could not start ${agentBin}: ${e.message}`));
+                console.log(chalk.yellow(`[Agent] Please ensure ${agentBin} is installed and in your PATH.`));
+                console.log(chalk.cyan(`[Agent] Prompt is still available at: ${promptFile}`));
               }
+            } else {
+              console.log(chalk.gray(`[Agent] No integration configured. Prompt saved to: ${promptFile}`));
             }
           }
           
@@ -220,6 +244,17 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
       return;
     }
     
+    if (url === '/api/state') {
+      const state = loadState(root);
+      if (state) {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ integration: state.integration || 'none' }));
+      } else {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: 'No state found' }));
+      }
+      return;
+    }
     if (url === '/tasks.json') {
       const state = loadState(root);
       const stateTasks = (state?.tasks ?? []).map(t => ({

@@ -1,9 +1,11 @@
 import { Task, TaskStatus } from "./types.js";
 import React from 'react';
-import { TransitionAction } from './TaskDrawer.js';
+
+type TransitionAction = 'start' | 'start-dev' | 'continue' | 'complete' | 'block' | 'unblock' | 'reopen' | 'cancel';
 
 const ACTIONS: Record<TaskStatus, { label: string; action: TransitionAction; cls?: string }[]> = {
   'pending': [{ label: 'Start', action: 'start' }],
+  'ready-for-dev': [{ label: 'Start Dev', action: 'start-dev' }],
   'in-progress': [{ label: 'Complete', action: 'complete' }, { label: 'Block', action: 'block', cls: 'danger' }, { label: 'Continue', action: 'continue' }],
   'blocked': [{ label: 'Unblock', action: 'unblock' }, { label: 'Cancel', action: 'cancel', cls: 'secondary' }],
   'completed': [{ label: 'Reopen', action: 'reopen', cls: 'secondary' }],

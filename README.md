@@ -20,15 +20,41 @@ You're one person with big ideas, but:
 - **Agent-ready specifications** – Every task is unambiguous and testable
 - **6-phase methodology** – Discovery → Specification → Design → Implementation → Verification
 - **Quality gates** – Objective checkpoints that agents can validate automatically
-- **Live Kanban board** – Real-time visibility with interactive task management
+- **Live Kanban board** – Real-time visibility with interactive task management (6 columns)
 - **Auto-agent triggering** – Click a task action, the relevant agent starts working
+- **Terminal overlay** – See agent session details directly in the browser
+- **Multi-agent support** – Works with Vibe, Claude Code, and OpenCode
+- **Human-in-the-loop** – Critical phases require human interaction
+- **State consistency** – Tasks stay in-progress until implementation is verified
 
 ---
 
 ## 🚀 60-Second Start
 
+### Option A: Install from this repository (Development)
+
 ```bash
-# Install globally
+# Clone the repository
+git clone <repo-url> pocket-dev
+cd pocket-dev
+
+# Build the CLI
+npm run build
+
+# Run directly (no installation needed)
+node packages/cli/dist/index.js init
+
+# Or use the wrapper script
+./pocket-dev-cli.sh init
+
+# Launch the agile board
+./pocket-dev-cli.sh board --open
+```
+
+### Option B: Install globally (After publishing to npm)
+
+```bash
+# Install globally (once published)
 npm install -g pocket-dev
 
 # Initialize your project
@@ -37,8 +63,19 @@ pocket-dev init
 
 # Launch the agile board
 pocket-dev board --open
+```
 
-# Click a task → Agent starts automatically
+### Option C: Link for development
+
+```bash
+# In the pocket-dev repository
+npm run build
+npm link
+
+# Now pocket-dev CLI is available globally
+cd /your/project
+pocket-dev init
+pocket-dev board --open
 ```
 
 **That's it.** The framework docs install under `.pocket-dev/`, your Kanban board opens in the browser, and every action you take triggers the appropriate AI agent with full context.
@@ -55,13 +92,15 @@ Start with a clear problem statement. Pocket Dev provides templates for every ar
 
 ### 2. Click to Progress
 Each task on the Kanban board has **action buttons** (Start, Complete, Block, Unblock). When you click:
-1. ✅ **Status updates** – Task moves to the next column
-2. 🤖 **Agent launches** – The configured AI agent (Vibe, Claude, OpenCode) receives:
+1. ✅ **Status updates** – Task moves to the appropriate column
+2. 🖥️ **Terminal overlay** – Shows agent session details and observation instructions
+3. 🤖 **Agent launches** – The configured AI agent (Vibe, Claude, OpenCode) receives:
    - Full task context (name, description, phase, open items, next steps)
    - Phase-specific methodology guidelines
    - Relevant templates and standards
    - Instructions to update state when done
-3. 📊 **State persists** – Everything is saved to `.pocket-dev/state.json`
+   - Observation instructions for monitoring progress
+4. 📊 **State persists** – Everything is saved to `.pocket-dev/state.json`
 
 ### 3. Validate & Repeat
 - Run `pocket-dev validate` to ensure everything meets quality gates
@@ -74,10 +113,12 @@ Each task on the Kanban board has **action buttons** (Start, Complete, Block, Un
 
 ![Kanban board](docs/assets/kanban-board.png)
 
-*Click a tile → View details, open items, and next steps → Click "Start" → Agent begins work with full context from the framework*
+*Board with 6 columns: Pending, Ready for Dev, In Progress, Blocked, Completed, Cancelled · Click a tile → View details, open items, and next steps → Click action button → Agent begins work with full context from the framework*
 
 ![Kanban workflow demo](docs/assets/board-workflow-demo.gif)
-*Click a task tile → Drawer opens with details → Click action buttons to trigger agents automatically*
+*Click a task tile → Drawer opens with details → Click action button → Terminal overlay shows session → Agent triggered automatically*
+
+> **Note**: Screenshots will be updated to reflect the latest 6-column board design and terminal overlay features.
 
 ---
 
@@ -90,6 +131,23 @@ Each task on the Kanban board has **action buttons** (Start, Complete, Block, Un
 | `pocket-dev validate` | Runs 170+ consistency checks against the framework |
 | `pocket-dev deps` | Verifies Node.js, npm, Git, and other required tools |
 | `pocket-dev board [--port 4173] [--open]` | Serves the interactive Kanban board |
+| `pocket-dev scan [-v]` | Scans specs directory and populates state.json with features and tasks |
+
+### Board Actions
+
+When viewing the board, each task card has action buttons:
+
+| Button | From Status | To Status | Trigger |
+|--------|-------------|-----------|---------|
+| **Start** | Pending | In Progress | Auto-agent triggered |
+| **Start Dev** | Ready for Dev | In Progress | Auto-agent triggered |
+| **Continue** | In Progress | In Progress | Auto-agent triggered |
+| **Complete** | In Progress | Completed | Auto-agent triggered |
+| **Block** | In Progress | Blocked | Auto-agent triggered |
+| **Unblock** | Blocked | In Progress | Auto-agent triggered |
+| **Reopen** | Completed/Cancelled | In Progress | Auto-agent triggered |
+
+Each action triggers the configured AI agent (Vibe, Claude, OpenCode) with full task context.
 
 ---
 

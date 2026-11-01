@@ -55,6 +55,15 @@ program
     await runBoard(process.cwd(), opts);
   });
 
+program
+  .command('scan')
+  .description('Scan specs directory and update state.json with features and tasks')
+  .option('-v, --verbose', 'Show detailed output')
+  .action(async (opts) => {
+    const { runScan } = await import('./commands/scan.js');
+    await runScan(process.cwd(), opts);
+  });
+
 program.parseAsync(process.argv).catch((err) => {
   console.error(chalk.red('Error:'), err?.message ?? err);
   process.exit(1);
