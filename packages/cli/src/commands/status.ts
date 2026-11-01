@@ -11,12 +11,14 @@ export async function runStatus(root: string): Promise<void> {
     return;
   }
   
-  // Check if state has empty features/tasks but specs directory exists
+  // Always check specs directory for consistency
   const specsDir = join(root, 'specs');
-  const hasEmptyState = state.features.length === 0 && state.tasks.length === 0;
   const hasSpecs = existsSync(specsDir);
   
-  if (hasEmptyState && hasSpecs) {
+  // Scan specs if specs exist but state is empty OR if there are potential updates
+  const needsScan = hasSpecs && (state.features.length === 0 || state.tasks.length === 0);
+  
+  if (needsScan) {
     // Try to scan specs and update state
     const { featuresFound, tasksFound, updated } = updateStateFromSpecs(root);
     if (updated) {

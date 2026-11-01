@@ -1,13 +1,13 @@
 import { Task, TaskStatus } from "./types.js";
 import React from 'react';
 
-export type TransitionAction = 'start' | 'start-dev' | 'continue' | 'complete' | 'block' | 'unblock' | 'reopen' | 'cancel';
+export type TransitionAction = 'start' | 'start-dev' | 'continue' | 'complete' | 'review' | 'block' | 'unblock' | 'reopen' | 'cancel';
 
 export function TaskDrawer({ task, onClose, onAction }: { task: Task; onClose: () => void; onAction: (id: string, action: TransitionAction) => void; }): React.ReactElement {
   const ACTIONS: Record<TaskStatus, { label: string; action: TransitionAction; cls?: string }[]> = {
     'pending': [{ label: 'Start', action: 'start' }],
     'ready-for-dev': [{ label: 'Start Dev', action: 'start-dev' }],
-    'in-progress': [{ label: 'Complete', action: 'complete' }, { label: 'Block', action: 'block', cls: 'danger' }, { label: 'Continue', action: 'continue' }],
+    'in-progress': [{ label: 'Complete', action: 'complete' }, { label: 'Review', action: 'review', cls: 'secondary' }, { label: 'Block', action: 'block', cls: 'danger' }, { label: 'Continue', action: 'continue' }],
     'blocked': [{ label: 'Unblock', action: 'unblock' }, { label: 'Cancel', action: 'cancel', cls: 'secondary' }],
     'completed': [{ label: 'Reopen', action: 'reopen', cls: 'secondary' }],
     'cancelled': [{ label: 'Reopen', action: 'reopen', cls: 'secondary' }]

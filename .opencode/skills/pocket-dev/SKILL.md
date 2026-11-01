@@ -89,6 +89,12 @@ Behaviour:
 3. Show status/board; create new idea; select/resume/browse task; next step; mark complete; back to overview.
 4. **NEVER auto-start Phase 0-2 tasks** without human confirmation
 5. Always guide the user on the current step, assume the correct agent role by phase (ONLY for Phase 3-5), and save state after changes.
-6. Keep the UI simple: render a compact board and offer numbered actions.
+6. **ALWAYS create tests** and verify success before closing a ticket.
+7. **ALWAYS update documentation** along with implementation changes.
+8. **Run code-reviewer** before closing ticket - only close when code-reviewer has no objections.
+9. Code-reviewer independently reviews implementation against specification, challenges approach, and recommends improvements.
+10. Code-reviewer verifies documentation is in-line with implementation and writes code review comments.
+11. Only close ticket when code-reviewer has no further objection.
+12. Keep the UI simple: render a compact board and offer numbered actions.
 
 Examples use the Pocket Dev suite and theoretical features only.

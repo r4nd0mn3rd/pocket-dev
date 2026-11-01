@@ -21,6 +21,12 @@ function buildAgentPrompt(task: Task, action: TransitionAction, state: ProjectSt
   const agentRole = state.framework_config.agent_roles[String(phase)];
   const integration = state.integration ?? 'none';
   
+  // Determine role based on action
+  let role = state.framework_config.agent_roles[String(phase)];
+  if (action === 'review') {
+    role = 'code-reviewer';
+  }
+  
   // Build context from task
   const contextParts = [
     `Project: ${state.project_name}`,
@@ -44,7 +50,7 @@ function buildAgentPrompt(task: Task, action: TransitionAction, state: ProjectSt
   const checklistsDir = join(root, '.pocket-dev', '05-checklists');
   
   // Build instructions based on action
-  const instructions = buildActionInstructions(action, task, phase, agentRole, integration, templatesDir, checklistsDir);
+  const instructions = buildActionInstructions(action, task, phase, role, integration, templatesDir, checklistsDir);
   
   return contextParts.join('\n') + '\n\n' + instructions;
 }
@@ -72,6 +78,9 @@ function buildActionInstructions(action: TransitionAction, task: Task, phase: nu
       break;
     case 'complete':
       baseInstructions.push(`Complete this task. Ensure all acceptance criteria are met and documentation is updated.`);
+      break;
+    case 'review':
+      baseInstructions.push(`**REVIEW REQUIREMENT**: You are the **code-reviewer** agent. Review the implementation against the specification. Verify documentation is in-line with code. Write code review comments. Challenge approach and recommend improvements.`);
       break;
     case 'block':
       baseInstructions.push(`Identify what is blocking this task and document the blocking reason.`);
