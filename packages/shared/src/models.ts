@@ -1,4 +1,4 @@
-export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'blocked' | 'cancelled';
+export type TaskStatus = 'pending' | 'ready-for-dev' | 'in-progress' | 'completed' | 'blocked' | 'cancelled';
 export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
 export type TaskPhase = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -54,9 +54,10 @@ export interface ProjectState {
   integration?: IntegrationType;
 }
 
-export const TASK_STATUSES: TaskStatus[] = ['pending', 'in-progress', 'completed', 'blocked', 'cancelled'];
+export const TASK_STATUSES: TaskStatus[] = ['pending', 'ready-for-dev', 'in-progress', 'completed', 'blocked', 'cancelled'];
 export const STATUS_COLUMNS: { id: TaskStatus; label: string; color: string }[] = [
   { id: 'pending', label: 'Pending', color: '#9ca3af' },
+  { id: 'ready-for-dev', label: 'Ready for Dev', color: '#8b5cf6' },
   { id: 'in-progress', label: 'In Progress', color: '#3b82f6' },
   { id: 'blocked', label: 'Blocked', color: '#ef4444' },
   { id: 'completed', label: 'Completed', color: '#10b981' },

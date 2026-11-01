@@ -64,6 +64,9 @@ function buildActionInstructions(action: TransitionAction, task: Task, phase: nu
     case 'start':
       baseInstructions.push(`Begin work on this task. Follow the Pocket Dev methodology for ${phaseName}.`);
       break;
+    case 'start-dev':
+      baseInstructions.push(`Begin implementation work on this task. This is a development task in Phase ${phase} (${phaseName}).`);
+      break;
     case 'continue':
       baseInstructions.push(`Continue working on this task where you left off.`);
       break;
@@ -241,6 +244,17 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
       return;
     }
     
+    if (url === '/api/state') {
+      const state = loadState(root);
+      if (state) {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ integration: state.integration || 'none' }));
+      } else {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: 'No state found' }));
+      }
+      return;
+    }
     if (url === '/tasks.json') {
       const state = loadState(root);
       const stateTasks = (state?.tasks ?? []).map(t => ({

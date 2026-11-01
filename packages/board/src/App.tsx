@@ -5,6 +5,7 @@ import { Task, TaskStatus } from './types.js';
 
 const COLUMNS: { id: TaskStatus; label: string; color: string }[] = [
   { id: 'pending', label: 'Pending', color: '#9ca3af' },
+  { id: 'ready-for-dev', label: 'Ready for Dev', color: '#8b5cf6' },
   { id: 'in-progress', label: 'In Progress', color: '#3b82f6' },
   { id: 'blocked', label: 'Blocked', color: '#ef4444' },
   { id: 'completed', label: 'Completed', color: '#10b981' },
@@ -59,6 +60,15 @@ export function App(): React.ReactElement {
   const [terminalVisible, setTerminalVisible] = useState(false);
   const [terminalContent, setTerminalContent] = useState<string[]>([]);
   const [currentSession, setCurrentSession] = useState<string | null>(null);
+  const [integration, setIntegration] = useState<string>('none');
+
+  // Load integration setting
+  useEffect(() => {
+    fetch('/api/state')
+      .then(r => r.json())
+      .then((state: any) => setIntegration(state.integration || 'none'))
+      .catch(() => setIntegration('none'));
+  }, []);
 
   const handleAction = async (id: string, action: any) => {
     try {
@@ -73,15 +83,24 @@ export function App(): React.ReactElement {
         setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updated } : t));
         if (selected?.id === id) setSelected(prev => prev ? { ...prev, ...updated } : null);
         setNotification({ message: `Agent triggered for: ${action}`, type: 'success' });
-        // Show terminal overlay with agent info
+        // Show terminal overlay with agent info and observation instructions
+        const observationInstructions = integration === 'opencode' 
+          ? `> To observe: Check your OpenCode application - a new session should have opened with the prompt.`
+          : integration === 'vibe' 
+          ? `> To observe: Check your terminal where Vibe is running, or open Vibe separately.`
+          : integration === 'claude' 
+          ? `> To observe: Check your terminal where Claude Code is running, or open Claude separately.`
+          : `> To observe: Agent prompt saved to file. Open your agent manually.`;
+        
         setTerminalContent([
           `> Agent Session Started (${new Date().toLocaleTimeString()})`,
           `> Action: ${action}`,
           `> Task: ${updated.name || id}`,
           `> Phase: ${updated.phase || 'unknown'}`,
           `> Status: ${updated.status || 'unknown'}`,
+          `> Integration: ${integration || 'none'}`,
           `>`,
-          `> Agent output will appear in OpenCode window...`,
+          observationInstructions,
           `> Prompt saved to: .pocket-dev/prompt-${id}-*.md`
         ]);
         setCurrentSession(`agent-${id}-${Date.now()}`);
