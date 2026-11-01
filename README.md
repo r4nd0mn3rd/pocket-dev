@@ -97,6 +97,10 @@ Each task on the Kanban board has **action buttons** (Start, Complete, Block, Un
 
 ```
 Your Project/
+├── AGENTS.md                            # Project-specific agent instructions (OPTIONAL)
+│                                       #   Override default framework behavior
+│                                       #   Require human interaction for specific phases
+│   
 ├── .pocket-dev/                          # Framework installation
 │   ├── 00-constitution/                 # Core principles & rules
 │   ├── 01-governance/                   # Decision processes
@@ -113,6 +117,8 @@ Your Project/
 │   └── [feature-id]/                    # Per-feature artifacts
 └── [your code]                          # Your implementation
 ```
+
+**AGENTS.md Location**: Place `AGENTS.md` in your **project root** (same level as `.pocket-dev/`) to provide project-specific agent instructions that override the default framework behavior.
 
 ---
 

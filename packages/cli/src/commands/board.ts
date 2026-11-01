@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import { loadState, saveState, statePath } from '../utils/state.js';
 import { transition, TransitionAction, availableActions } from '@pocket-dev/shared';
 import { ProjectState, Task, IntegrationType } from '@pocket-dev/shared';
+import { requiresHumanInteraction } from '../utils/agents.js';
 
 const AGENT_COMMANDS: Record<IntegrationType, string> = {
   claude: 'claude',
@@ -149,48 +150,63 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
           state.tasks[taskIndex] = updatedTask;
           saveState(root, state);
           
-          // Trigger agent for next step
-          const integration = state.integration ?? 'none';
-          if (integration && integration !== 'none') {
+          // Check if human interaction is required for this phase
+          const needsHumanInteraction = requiresHumanInteraction(root, task.phase);
+          
+          if (needsHumanInteraction) {
+            console.log(chalk.yellow(`[Agent] Phase ${task.phase} requires human interaction. Agent not auto-started.`));
+            console.log(chalk.yellow(`[Agent] Please run agent manually after human confirmation.`));
+            
+            // Save prompt file for manual review
             const agentRole = state.framework_config.agent_roles[String(task.phase)];
             const prompt = buildAgentPrompt(task, action, state, root);
-            
-            // Save prompt file
             const promptFile = join(root, '.pocket-dev', `prompt-${task.id}-${Date.now()}.md`);
             writeFileSync(promptFile, prompt, 'utf8');
-            console.log(chalk.cyan(`[Agent] Prompt saved: ${promptFile}`));
-            
-            // Build and execute agent command
-            let agentBin = '';
-            let agentArgs: string[] = [];
-            switch (integration) {
-              case 'vibe':
-                agentBin = 'vibe';
-                agentArgs = ['-p', prompt];
-                break;
-              case 'claude':
-                agentBin = 'claude';
-                // Truncate and escape for CLI safety
-                const safePrompt = prompt.replace(/\n/g, ' ').slice(0, 7000);
-                agentArgs = ['--prompt', safePrompt];
-                break;
-              case 'opencode':
-                agentBin = 'opencode';
-                agentArgs = []; // Launch TUI - user will run /pocket-dev manually
-                break;
-            }
-            
-            try {
-              const proc = spawn(agentBin, agentArgs, { 
-                cwd: root, 
-                shell: false,
-                stdio: 'inherit',
-                detached: true
-              });
-              proc.unref();
-              console.log(chalk.green(`[Agent] Started: ${agentBin} ${agentArgs.join(' ')}`));
-            } catch (e: any) {
-              console.log(chalk.yellow(`[Agent] Could not start ${agentBin}: ${e.message}. Please ensure it is installed and in PATH.`));
+            console.log(chalk.cyan(`[Agent] Prompt saved for review: ${promptFile}`));
+          } else {
+            // Trigger agent for next step
+            const integration = state.integration ?? 'none';
+            if (integration && integration !== 'none') {
+              const agentRole = state.framework_config.agent_roles[String(task.phase)];
+              const prompt = buildAgentPrompt(task, action, state, root);
+              
+              // Save prompt file
+              const promptFile = join(root, '.pocket-dev', `prompt-${task.id}-${Date.now()}.md`);
+              writeFileSync(promptFile, prompt, 'utf8');
+              console.log(chalk.cyan(`[Agent] Prompt saved: ${promptFile}`));
+              
+              // Build and execute agent command
+              let agentBin = '';
+              let agentArgs: string[] = [];
+              switch (integration) {
+                case 'vibe':
+                  agentBin = 'vibe';
+                  agentArgs = ['-p', prompt];
+                  break;
+                case 'claude':
+                  agentBin = 'claude';
+                  // Truncate and escape for CLI safety
+                  const safePrompt = prompt.replace(/\n/g, ' ').slice(0, 7000);
+                  agentArgs = ['--prompt', safePrompt];
+                  break;
+                case 'opencode':
+                  agentBin = 'opencode';
+                  agentArgs = []; // Launch TUI - user will run /pocket-dev manually
+                  break;
+              }
+              
+              try {
+                const proc = spawn(agentBin, agentArgs, { 
+                  cwd: root, 
+                  shell: false,
+                  stdio: 'inherit',
+                  detached: true
+                });
+                proc.unref();
+                console.log(chalk.green(`[Agent] Started: ${agentBin} ${agentArgs.join(' ')}`));
+              } catch (e: any) {
+                console.log(chalk.yellow(`[Agent] Could not start ${agentBin}: ${e.message}. Please ensure it is installed and in PATH.`));
+              }
             }
           }
           
