@@ -1,0 +1,14 @@
+# Framework runtime state (per-project; keep out of version control)
+.framework/state.json
+.framework/tasks/
+.framework/sessions/
+
+# Specs are project work products; ignore by default, commit if desired
+# specs/
+
+# OS / editor
+.DS_Store
+*.swp
+node_modules/
+packages/*/dist/
+packages/*/node_modules/

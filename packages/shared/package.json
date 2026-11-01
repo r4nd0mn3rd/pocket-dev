@@ -1,0 +1,16 @@
+{
+  "name": "@pocket-dev/shared",
+  "version": "1.0.0",
+  "description": "Shared types and models for Pocket Dev CLI and Board",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p .",
+    "dev": "tsc -p . --watch",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

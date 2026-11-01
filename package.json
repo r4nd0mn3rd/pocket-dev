@@ -1,0 +1,64 @@
+{
+  "name": "pocket-dev",
+  "version": "1.0.0",
+  "description": "Pocket Dev — Solo Agent Development Framework CLI and Agile Board. Plan, design, specify, and implement apps from idea to production with AI agents.",
+  "keywords": [
+    "agent",
+    "framework",
+    "cli",
+    "agile-board",
+    "development-process",
+    "kanban"
+  ],
+  "license": "MIT",
+  "author": "Thomas Jay",
+  "type": "module",
+  "private": false,
+  "workspaces": [
+    "packages/shared",
+    "packages/cli",
+    "packages/board"
+  ],
+  "bin": {
+    "pocket-dev": "packages/cli/dist/index.js"
+  },
+  "scripts": {
+    "build": "npm run build -w packages/shared && npm run build -w packages/cli && npm run build -w packages/board",
+    "build:cli": "npm run build -w packages/shared && npm run build -w packages/cli",
+    "build:board": "npm run build -w packages/board",
+    "dev:cli": "npm run dev -w packages/cli",
+    "dev:board": "npm run dev -w packages/board",
+    "test": "npm run test -w packages/cli && npm run test -w packages/board",
+    "test:cli": "npm run test -w packages/cli",
+    "lint": "npm run lint -w packages/cli && npm run lint -w packages/board",
+    "start": "node packages/cli/dist/index.js",
+    "postinstall": "npm link",
+    "preuninstall": "npm unlink"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "packages/cli/dist",
+    "packages/board/dist",
+    "packages/shared/dist",
+    "00-constitution",
+    "01-governance",
+    "02-methodology",
+    "03-standards",
+    "04-templates",
+    "05-checklists",
+    "06-automation",
+    "07-examples",
+    ".opencode",
+    "README.md",
+    "GETTING-STARTED.md",
+    "SUMMARY.md",
+    "LICENSE",
+    "install.sh"
+  ],
+  "allowScripts": {
+    "esbuild@0.21.5": true,
+    "fsevents@2.3.3": true
+  }
+}

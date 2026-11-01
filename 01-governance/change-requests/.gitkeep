@@ -1,0 +1,22 @@
+# Change Requests Directory
+
+This directory stores formal change requests for the framework.
+
+## Purpose
+
+Track and manage proposed changes to the Solo Agent Development Framework through a structured change request process.
+
+## Process
+
+1. Create a new change request file: `cr-{number}-{description}.md`
+2. Follow the change request template
+3. Submit for review via the governance process
+4. Track status and resolution
+
+## Templates
+
+- [Change Request Template](../../04-templates/change-request-template.md)
+
+## Current Change Requests
+
+None at this time.
