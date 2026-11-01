@@ -27,8 +27,30 @@ You're one person with big ideas, but:
 
 ## 🚀 60-Second Start
 
+### Option A: Install from this repository (Development)
+
 ```bash
-# Install globally
+# Clone the repository
+git clone <repo-url> pocket-dev
+cd pocket-dev
+
+# Build the CLI
+npm run build
+
+# Run directly (no installation needed)
+node packages/cli/dist/index.js init
+
+# Or use the wrapper script
+./pocket-dev-cli.sh init
+
+# Launch the agile board
+./pocket-dev-cli.sh board --open
+```
+
+### Option B: Install globally (After publishing to npm)
+
+```bash
+# Install globally (once published)
 npm install -g pocket-dev
 
 # Initialize your project
@@ -37,8 +59,19 @@ pocket-dev init
 
 # Launch the agile board
 pocket-dev board --open
+```
 
-# Click a task → Agent starts automatically
+### Option C: Link for development
+
+```bash
+# In the pocket-dev repository
+npm run build
+npm link
+
+# Now pocket-dev CLI is available globally
+cd /your/project
+pocket-dev init
+pocket-dev board --open
 ```
 
 **That's it.** The framework docs install under `.pocket-dev/`, your Kanban board opens in the browser, and every action you take triggers the appropriate AI agent with full context.
