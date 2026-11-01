@@ -194,16 +194,19 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
                   break;
                 case 'opencode':
                   agentBin = 'opencode';
-                  agentArgs = [];
-                  launchMessage = `Starting OpenCode TUI. Run /pocket-dev inside OpenCode to load the prompt.`;
-                  // Also write the prompt to a location OpenCode can find it
-                  const opencodePromptDir = join(root, '.pocket-dev', 'opencode-prompts');
-                  if (!existsSync(opencodePromptDir)) {
-                    mkdirSync(opencodePromptDir, { recursive: true });
+                  // Use OpenCode's --prompt flag to inject the prompt directly
+                  // Also limit length to avoid CLI issues
+                  const opencodePrompt = prompt.slice(0, 15000);
+                  agentArgs = ['--prompt', opencodePrompt, root];
+                  launchMessage = `Starting OpenCode with injected prompt in ${root}`;
+                  // Also save prompt file for reference
+                  const promptDir = join(root, '.pocket-dev', 'opencode-prompts');
+                  if (!existsSync(promptDir)) {
+                    mkdirSync(promptDir, { recursive: true });
                   }
-                  const opencodePromptFile = join(opencodePromptDir, `prompt-${task.id}.md`);
+                  const opencodePromptFile = join(promptDir, `prompt-${task.id}.md`);
                   writeFileSync(opencodePromptFile, prompt, 'utf8');
-                  console.log(chalk.cyan(`[Agent] Prompt also saved for OpenCode: ${opencodePromptFile}`));
+                  console.log(chalk.cyan(`[Agent] Prompt also saved at: ${opencodePromptFile}`));
                   break;
               }
               
