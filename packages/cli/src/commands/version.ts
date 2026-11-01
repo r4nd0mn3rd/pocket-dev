@@ -16,17 +16,17 @@ export async function runVersion(root: string, opts: { bump?: string; show?: boo
   const pkgPath = join(process.cwd(), '..', '..', 'package.json'); // fallback
   // find package.json by walking up
   let pkgFile = '';
-  const candidates = [
-    join(process.cwd(), 'package.json'),
-    join(root, 'package.json'),
-    join(__dirname_placeholder(), '..', '..', 'package.json')
-  ];
-  // simpler: search upward from root
-  let dir = root;
-  for (let i = 0; i < 5; i++) {
-    const p = join(dir, 'package.json');
-    if (existsSync(p)) { pkgFile = p; break; }
-    dir = join(dir, '..');
+  const searchDirs = [root, process.cwd(), '/Users/tom/Documents/Repos/pocket-dev'];
+  for (const start of searchDirs) {
+    let dir = start;
+    for (let i = 0; i < 8; i++) {
+      const p = join(dir, 'package.json');
+      if (existsSync(p)) {
+        try { const j = JSON.parse(readFileSync(p,'utf8')); if (j && j.name === 'pocket-dev') { pkgFile = p; break; } } catch {}
+      }
+      dir = join(dir, '..');
+    }
+    if (pkgFile) break;
   }
   if (!pkgFile) {
     console.log(chalk.red('package.json not found'));

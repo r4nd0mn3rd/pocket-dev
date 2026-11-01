@@ -1,6 +1,6 @@
 {
   "name": "pocket-dev",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pocket Dev — Solo Agent Development Framework CLI and Agile Board. Plan, design, specify, and implement apps from idea to production with AI agents.",
   "keywords": [
     "agent",
