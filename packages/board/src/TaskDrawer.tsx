@@ -57,6 +57,18 @@ export function TaskDrawer({ task, onClose, onAction, onTaskUpdate }: Props): Re
       <button className="close" onClick={onClose}>✕</button>
       <h2>{task.name}</h2>
       {task.description && <div className="row"><div className="label">Description</div><div className="value">{task.description}</div></div>}
+      {task.userStories && task.userStories.length > 0 && (
+        <div className="row">
+          <div className="label">User Stories</div>
+          <ul>{task.userStories.map((u,i)=><li key={i}>{u}</li>)}</ul>
+        </div>
+      )}
+      {task.requirements && task.requirements.length > 0 && (
+        <div className="row">
+          <div className="label">Requirements</div>
+          <ul>{task.requirements.map((r,i)=><li key={i}>{r}</li>)}</ul>
+        </div>
+      )}
       <div className="row"><div className="label">Status</div><div className="value">{task.status}</div></div>
       <div className="row"><div className="label">Priority</div><div className="value">{task.priority}</div></div>
       <div className="row"><div className="label">Phase</div><div className="value">{task.phase}</div></div>

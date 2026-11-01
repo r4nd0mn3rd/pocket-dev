@@ -298,6 +298,8 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
         nextSteps: t.nextSteps,
         blockedReason: t.blockedReason,
         specification: t.specification,
+        userStories: t.userStories,
+        requirements: t.requirements,
         successCriteria: t.successCriteria,
         acceptanceCriteria: t.acceptanceCriteria,
         estimatedHours: t.estimatedHours,
