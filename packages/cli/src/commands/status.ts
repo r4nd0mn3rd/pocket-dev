@@ -2,12 +2,27 @@ import chalk from 'chalk';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadState } from '../utils/state.js';
+import { updateStateFromSpecs, scanSpecs } from '../utils/scanner.js';
 
 export async function runStatus(root: string): Promise<void> {
   const state = loadState(root);
   if (!state) {
     console.log(chalk.yellow('No .pocket-dev/state.json found. Run `pocket-dev init` first.'));
     return;
+  }
+  
+  // Check if state has empty features/tasks but specs directory exists
+  const specsDir = join(root, 'specs');
+  const hasEmptyState = state.features.length === 0 && state.tasks.length === 0;
+  const hasSpecs = existsSync(specsDir);
+  
+  if (hasEmptyState && hasSpecs) {
+    // Try to scan specs and update state
+    const { featuresFound, tasksFound, updated } = updateStateFromSpecs(root);
+    if (updated) {
+      console.log(chalk.cyan(`\nScanned specs directory: found ${featuresFound} feature(s) and ${tasksFound} task(s)`));
+      console.log(chalk.cyan('Updated state.json with scanned features and tasks.\n'));
+    }
   }
   
   console.log(chalk.bold(`\n📦 ${state.project_name}`));
@@ -58,5 +73,22 @@ export async function runStatus(root: string): Promise<void> {
   if (hasAgentsMd) {
     console.log('\n' + chalk.magenta('ℹ️') + chalk.white(' Project has custom agent instructions in AGENTS.md'));
     console.log(chalk.gray('  Some phases may require explicit human interaction.'));
+  }
+  
+  // Check if specs exist but state is still empty
+  if (state.features.length === 0 && state.tasks.length === 0 && hasSpecs) {
+    // Check if there are actually spec files
+    try {
+      const { features, tasks } = scanSpecs(root);
+      if (features.length > 0 || tasks.length > 0) {
+        console.log('\n' + chalk.yellow('─'.repeat(60)));
+        console.log(chalk.yellow('Note: Feature artifacts found in specs/ directory but not in state.json'));
+        console.log(chalk.yellow(`  Found ${features.length} feature(s) and ${tasks.length} task(s) in specs/`));
+        console.log(chalk.yellow('  Run `pocket-dev scan` to update state.json'));
+        console.log(chalk.yellow('─'.repeat(60)));
+      }
+    } catch {
+      // Ignore scan errors
+    }
   }
 }
