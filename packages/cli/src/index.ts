@@ -88,6 +88,16 @@ program
     await runVersion(process.cwd(), opts);
   });
 
+
+program
+  .command("update")
+  .description("Pull and install latest version from main (stable) or dev (preview)")
+  .option("-b, --branch <name>", "Branch to install: main or dev")
+  .action(async (opts) => {
+    const { runUpdate } = await import("./commands/update.js");
+    await runUpdate(process.cwd(), opts);
+  });
+
 program.parseAsync(process.argv).catch((err) => {
   console.error(chalk.red('Error:'), err?.message ?? err);
   process.exit(1);
