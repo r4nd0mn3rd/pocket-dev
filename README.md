@@ -131,8 +131,8 @@ Each task on the Kanban board has **action buttons** (Start, Complete, Block, Un
 | `pocket-dev validate` | Runs 170+ consistency checks against the framework |
 | `pocket-dev deps` | Verifies Node.js, npm, Git, and other required tools |
 | `pocket-dev board [--port 4173] [--open]` | Serves the interactive Kanban board |
-| `pocket-dev version [--bump patch|minor|major]` | Show the current version, or bump it (patch, minor, or major) |
-| `pocket-dev update [--branch main|dev]` | Pull and install the latest pocket-dev from the main or dev branch |
+| `pocket-dev version [--bump patch\|minor\|major]` | Show the current version, or bump it (patch, minor, or major) |
+| `pocket-dev update [--branch main\|dev]` | Pull and install the latest pocket-dev from the main or dev branch |
 | `pocket-dev new-spec <name>` | Create a new feature spec scaffold with an idea.md template |
 | `pocket-dev scan [-v]` | Scans specs directory and populates state.json with features and tasks |
 | `pocket-dev map <name> [-d dest]` | Chart a Wayfinder-style decision map (plan, don't do) |
