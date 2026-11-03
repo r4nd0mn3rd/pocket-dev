@@ -7,6 +7,7 @@ import { loadState, saveState, statePath } from '../utils/state.js';
 import { transition, TransitionAction, availableActions } from '@pocket-dev/shared';
 import { ProjectState, Task, IntegrationType } from '@pocket-dev/shared';
 import { requiresHumanInteraction } from '../utils/agents.js';
+import { loadRuns, saveRuns } from '../utils/agentRuntime.js';
 
 const AGENT_COMMANDS: Record<IntegrationType, string> = {
   claude: 'claude',
@@ -152,7 +153,7 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
       req.on('data', chunk => body += chunk);
       req.on('end', () => {
         try {
-          const { id, action }: { id: string; action: TransitionAction } = JSON.parse(body);
+          const { id, action, runtime }: { id: string; action: TransitionAction; runtime?: string } = JSON.parse(body);
           const state = loadState(root);
           if (!state) { res.statusCode = 400; return res.end(JSON.stringify({ error: 'No state' })); }
           const taskIndex = state.tasks.findIndex(t => t.id === id);
@@ -233,6 +234,21 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
                 });
                 proc.unref();
                 console.log(chalk.green(`[Agent] Process started: ${agentBin} ${agentArgs.join(' ')}`));
+                try {
+                  const runs = loadRuns(root);
+                  const chosenRuntime = (runtime && runtime !== 'auto') ? runtime : (state.runtime?.preferred ?? 'none');
+                  runs.push({
+                    id: `run-${Date.now()}`,
+                    taskId: task.id,
+                    agent: integration,
+                    status: 'working',
+                    pid: proc.pid,
+                    startedAt: new Date().toISOString(),
+                    worktreePath: undefined,
+                    oscStatus: `runtime=${chosenRuntime}`
+                  });
+                  saveRuns(root, runs);
+                } catch {}
               } catch (e: any) {
                 console.log(chalk.yellow(`[Agent] Could not start ${agentBin}: ${e.message}`));
                 console.log(chalk.yellow(`[Agent] Please ensure ${agentBin} is installed and in your PATH.`));
@@ -257,7 +273,7 @@ export async function runBoard(root: string, opts: { port?: string; open?: boole
       const state = loadState(root);
       if (state) {
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ integration: state.integration || 'none', project_name: state.project_name || '', board_port: port, version: (state && state.framework_version) || '1.0.0' }));
+        res.end(JSON.stringify({ integration: state.integration || 'none', project_name: state.project_name || '', board_port: port, version: (state && state.framework_version) || '1.0.0', runtime: state.runtime || null }));
       } else {
         res.statusCode = 404;
         res.end(JSON.stringify({ error: 'No state found' }));

@@ -2,6 +2,60 @@ export type TaskStatus = 'pending' | 'ready-for-dev' | 'in-progress' | 'complete
 export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
 export type TaskPhase = 0 | 1 | 2 | 3 | 4 | 5;
 
+// ---- Wayfinder-style decision map types ----
+export type DecisionType = 'research' | 'prototype' | 'grilling' | 'task' | 'map';
+export type DecisionStatus = 'open' | 'resolved' | 'blocked' | 'skipped';
+
+export interface DecisionTicket {
+  id: string;
+  parentId?: string;
+  type: DecisionType;
+  title: string;
+  question: string;
+  context?: string;
+  blocks: string[];
+  dependsOn: string[];
+  status: DecisionStatus;
+  resolvedDecision?: string;
+  playtestGate?: boolean;
+  specPath?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  tags?: string[];
+}
+
+export interface DecisionMap {
+  id: string;
+  name: string;
+  destination: string;
+  tickets: DecisionTicket[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// ---- herdr-style agent runtime types ----
+export type AgentStateStatus = 'working' | 'idle' | 'blocked' | 'done' | 'unknown';
+export interface AgentRun {
+  id: string;
+  taskId?: string;
+  agent: string;
+  status: AgentStateStatus;
+  pid?: number;
+  startedAt?: string;
+  endedAt?: string;
+  worktreePath?: string;
+  oscStatus?: string;
+  logPath?: string;
+}
+
+export const WAYFINDER_LABELS = [
+  'wayfinder:map',
+  'wayfinder:research',
+  'wayfinder:prototype',
+  'wayfinder:grilling',
+  'wayfinder:task'
+] as const;
+
 export interface Task {
   id: string;
   name: string;
@@ -20,6 +74,13 @@ export interface Task {
   openItems?: string[];
   nextSteps?: string[];
   blockedReason?: string;
+  // wayfinder
+  decisionType?: DecisionType;
+  parentMap?: string;
+  decisionBlocks?: string[];
+  // herdr runtime
+  worktreePath?: string;
+  agentRunId?: string;
   specification?: string;
   userStories?: string[];
   requirements?: string[];
@@ -40,6 +101,15 @@ export interface Feature {
 
 export type IntegrationType = 'claude' | 'opencode' | 'vibe' | 'none';
 
+export type RuntimeTool = 'herdr' | 'tmux' | 'none';
+export interface RuntimeToolConfig { enabled: boolean; path?: string; version?: string; }
+export interface RuntimeConfig {
+  tools: { herdr?: RuntimeToolConfig; tmux?: RuntimeToolConfig };
+  preferred: RuntimeTool;
+  allowChoiceAtTrigger: boolean;
+  lastUsed?: RuntimeTool;
+}
+
 export interface ProjectState {
   framework_version: string;
   last_updated: string;
@@ -47,6 +117,8 @@ export interface ProjectState {
   project_description: string;
   features: Feature[];
   tasks: Task[];
+  decisionMaps?: DecisionMap[];
+  agentRuns?: AgentRun[];
   stats: {
     total_features: number;
     by_phase: Record<string, number>;
@@ -57,6 +129,7 @@ export interface ProjectState {
     agent_roles: Record<string, string>;
   };
   integration?: IntegrationType;
+  runtime?: RuntimeConfig;
 }
 
 export const TASK_STATUSES: TaskStatus[] = ['pending', 'ready-for-dev', 'in-progress', 'completed', 'blocked', 'cancelled'];

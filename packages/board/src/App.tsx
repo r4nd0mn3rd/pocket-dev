@@ -84,22 +84,30 @@ export function App(): React.ReactElement {
   const [integration, setIntegration] = useState<string>('none');
   const [projectName, setProjectName] = useState<string>('');
   const [version, setVersion] = useState<string>('');
+  const [runtime, setRuntime] = useState<any>(null);
 
   // Load integration setting
   useEffect(() => {
     fetch('/api/state')
       .then(r => r.json())
-      .then((state: any) => { setIntegration(state.integration || 'none'); setProjectName(state.project_name || ''); setVersion(state.version || ''); })
+      .then((state: any) => { setIntegration(state.integration || 'none'); setProjectName(state.project_name || ''); setVersion(state.version || ''); setRuntime(state.runtime || null); })
       .catch(() => setIntegration('none'));
   }, []);
 
   const handleAction = async (id: string, action: any) => {
     try {
       setNotification({ message: `Triggering ${action} on task ${id}...`, type: 'info' });
+      let chosenRuntime: string | undefined;
+      if (runtime?.allowChoiceAtTrigger && Object.keys(runtime.tools || {}).length > 1) {
+        const opts = Object.keys(runtime.tools).join(', ');
+        chosenRuntime = window.prompt(`Choose execution runtime (${opts})`, runtime.preferred || 'herdr') || undefined;
+      } else if (runtime?.preferred) {
+        chosenRuntime = runtime.preferred;
+      }
       const res = await fetch('/api/transition', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, action })
+        body: JSON.stringify({ id, action, runtime: chosenRuntime })
       });
       if (res.ok) {
         const { task: updated } = await res.json();

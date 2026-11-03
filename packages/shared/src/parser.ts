@@ -11,6 +11,8 @@ export function parseStateJson(raw: string): ProjectState {
     project_description: data.project_description ?? '',
     features,
     tasks,
+    decisionMaps: data.decisionMaps ?? [],
+    agentRuns: data.agentRuns ?? [],
     stats: data.stats ?? { total_features: features.length, by_phase: {} },
     framework_config: data.framework_config ?? { phases: [], gates: [], agent_roles: {} },
     integration: data.integration

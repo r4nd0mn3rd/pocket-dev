@@ -20,6 +20,7 @@ program
   .description('Initialize the framework in a target directory')
   .option('-y, --yes', 'Skip confirmation prompts')
   .option('-i, --integration <name>', 'Integration target: claude, opencode, vibe, or none')
+  .option('-r, --runtime <name>', 'Execution runtime: herdr, tmux, both, none, or auto (interactive if omitted)')
   .action(async (target, opts) => {
     const { runInit } = await import('./commands/init.js');
     await runInit(target ?? process.cwd(), opts);
@@ -78,6 +79,23 @@ program
     await runNewSpec(process.cwd(), name);
   });
 
+program
+  .command("map <name>")
+  .description("Chart a Wayfinder-style decision map (plan, don't do)")
+  .option("-d, --destination <text>", "Destination the map is finding a way to")
+  .action(async (name, opts) => {
+    const { runMap } = await import("./commands/map.js");
+    await runMap(process.cwd(), name, opts.destination);
+  });
+
+program
+  .command("grill [topic]")
+  .description("Lazy CONTEXT.md + ADR scaffolding (grill-with-docs style)")
+  .action(async (topic) => {
+    const { runGrill } = await import("./commands/grill.js");
+    await runGrill(process.cwd(), topic);
+  });
+
 
 program
   .command("version")
@@ -88,6 +106,15 @@ program
     await runVersion(process.cwd(), opts);
   });
 
+
+program
+  .command("runtime")
+  .description("Detect/configure execution runtimes (herdr, tmux) and set default")
+  .option("--reconfigure", "Re-run interactive runtime setup")
+  .action(async (opts) => {
+    const { runRuntime } = await import("./commands/runtime.js");
+    await runRuntime(process.cwd(), opts);
+  });
 
 program
   .command("update")

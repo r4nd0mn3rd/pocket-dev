@@ -1,6 +1,6 @@
 # Pocket Dev — Solo Agent Development Framework
 
-> **Version**: 1.0.0 &nbsp;&nbsp; **Package**: `npm install -g pocket-dev` &nbsp;&nbsp; **Status**: Active
+> **Version**: 1.1.0 &nbsp;&nbsp; **Package**: `npm install -g pocket-dev` &nbsp;&nbsp; **Status**: Active
 
 ---
 
@@ -134,6 +134,8 @@ Each task on the Kanban board has **action buttons** (Start, Complete, Block, Un
 | `pocket-dev version [--bump patch|minor|major]` | Show or bump version |
 | `pocket-dev update [--branch main|dev]` | Pull and install latest version |
 | `pocket-dev scan [-v]` | Scans specs directory and populates state.json with features and tasks |
+| `pocket-dev map <name> [-d dest]` | Chart a Wayfinder-style decision map (plan, don't do) |
+| `pocket-dev grill [topic]` | Lazy CONTEXT.md + ADR scaffolding (grill-with-docs style) |
 
 ### Board Actions
 
@@ -264,4 +266,4 @@ Pocket Dev is successful when:
 
 ---
 
-**Framework**: v1.0.0 &nbsp;&nbsp; **Package**: `pocket-dev` &nbsp;&nbsp; **License**: MIT &nbsp;&nbsp; **Repository**: [github.com/r4nd0mn3rd/pocket-dev](https://github.com/r4nd0mn3rd/pocket-dev)
+**Framework**: v1.1.0 &nbsp;&nbsp; **Package**: `pocket-dev` &nbsp;&nbsp; **License**: MIT &nbsp;&nbsp; **Repository**: [github.com/r4nd0mn3rd/pocket-dev](https://github.com/r4nd0mn3rd/pocket-dev)
