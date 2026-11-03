@@ -18,7 +18,7 @@ You're one person with big ideas, but:
 
 **Pocket Dev solves this with:**
 - **Agent-ready specifications** – Every task is unambiguous and testable
-- **6-phase methodology** – Discovery → Specification → Design → Implementation → Verification
+- **6-phase methodology** – Ideation → Discovery → Specification → Design → Implementation → Verification
 - **Quality gates** – Objective checkpoints that agents can validate automatically
 - **Live Kanban board** – Real-time visibility with interactive task management (6 columns)
 - **Auto-agent triggering** – Click a task action, the relevant agent starts working
@@ -136,7 +136,7 @@ Each task on the Kanban board has **action buttons** (Start, Complete, Block, Un
 | `pocket-dev scan [-v]` | Scans specs directory and populates state.json with features and tasks |
 | `pocket-dev map <name> [-d dest]` | Chart a Wayfinder-style decision map (plan, don't do) |
 | `pocket-dev grill [topic]` | Lazy CONTEXT.md + ADR scaffolding (grill-with-docs style) |
-
+| `pocket-dev runtime [--reconfigure]` | Detect/configure execution runtimes (herdr, tmux) |
 ### Board Actions
 
 When viewing the board, each task card has action buttons:
